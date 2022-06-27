@@ -1,0 +1,25 @@
+diff --git a/speech_recognition/__init__.py b/speech_recognition/__init__.py
+index d763a9b..a7ab9c9 100644
+--- a/speech_recognition/__init__.py
++++ b/speech_recognition/__init__.py
+@@ -1665,7 +1665,7 @@ class Recognizer(AudioSource):
+                 human_string = self.tflabels[node_id]
+                 return human_string
+             
+-    def recognize_vosk(self, audio_data, language='en'):
++    def recognize_vosk(self, audio_data, language='en', grammar=None):
+         from vosk import Model, KaldiRecognizer
+         
+         assert isinstance(audio_data, AudioData), "Data must be audio data"
+@@ -1676,7 +1676,10 @@ class Recognizer(AudioSource):
+                 exit (1)
+             self.vosk_model = Model("model")
+ 
+-        rec = KaldiRecognizer(self.vosk_model, 16000);
++        if grammar:
++            rec = KaldiRecognizer(self.vosk_model, 16000, grammar)
++        else:
++            rec = KaldiRecognizer(self.vosk_model, 16000)
+         
+         rec.AcceptWaveform(audio_data.get_raw_data(convert_rate=16000, convert_width=2));
+         finalRecognition = rec.FinalResult()
