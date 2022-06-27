@@ -1,0 +1,28 @@
+<body>
+    <img id="popup" src="http://localhost:5000/vaultboy.png">
+</body>
+<script>
+
+function httpGet(theUrl)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+
+function reloadIFrame() {
+    var popup = document.getElementById('popup');
+    console.log('popup is ', popup);
+
+    isPopup = httpGet('http://localhost:5000/popup')
+
+    if (isPopup == "false") {
+        popup.setAttribute('hidden', 'true');
+    } else {
+        popup.removeAttribute('hidden')
+    }
+}
+reloadIFrame()
+window.setInterval("reloadIFrame();", 5000);
+</script>
