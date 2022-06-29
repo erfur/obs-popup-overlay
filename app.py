@@ -1,15 +1,13 @@
 import base64
 from flask import Flask, send_file, jsonify
+from flask_sock import Sock
+from time import sleep
 from voice_recognition import VoiceRecognition
-
-# class OverlayServer:
-#     def __init__(self, img_path):
-#         self.img_path = img_path
-#         self.
+from loguru import logger
 
 popup_flag = False
 app = Flask(__name__)
-# vr = VoiceRecognition('Microphone (NVIDIA Broadcast)', grammar="[\"test\", \"[unk]\"]")
+sock = Sock(app)
 
 img = 'vaultboy.png'
 @app.route('/' + img)
@@ -21,20 +19,16 @@ def main_page():
     with open('frontend.html') as f:
         return f.read()
 
-@app.route('/popup')
-def serve_flag():
-    global popup_flag
-    if popup_flag:
-        popup_flag = False
-        return "true"
-    return "false"
+@sock.route('/popup')
+def echo(sock):
+    try:
+        VoiceRecognition('Microphone (NVIDIA Broadcast)', 
+            grammar=['test', 'archlinux', '[unk]']
+            ).run(lambda: sock.send("true"))
+    except Exception as e:
+        logger.info('connection terminated: %s' % e)
+        sock.close()
 
-@app.route('/trigger')
-def change_flag():
-    global popup_flag
-    popup_flag = True
-    return ''
-        
 if __name__ == '__main__':
-    # OverlayServer('vaultboy.png').run()
-    app.run(host='0.0.0.0', port=5000)
+    logger.info("starting the webserver...")
+    app.run(host='127.0.0.1', port=5000)
